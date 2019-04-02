@@ -116,19 +116,22 @@ function playerMovement(){
 }
 
 // TODO: Instantiate Objects
-function Obstacle(x,y, width, height, xVelocity, color) {
-	this.x = x;
-	this.y = y;
-	this.height = height;
-	this.width = width; 
-	this.xVelocity = xVelocity;
+class Obstacle {
 
-	this.obstacleMovement = function() {
-		this.x -= 3.5;
-		this.xVelocity *= 0.9;
+	constructor(x,y, width, height, xVelocity, color) {
+		this.x = x;
+		this.y = y;
+		this.height = height;
+		this.width = width; 
+		this.xVelocity = xVelocity;
+  }
+
+	obstacleMovement(speed, velocity) {
+		this.x -= speed;
+		this.xVelocity *= velocity;
 	}
 
-	this.drawObstacle = function(color) {
+	drawObstacle(color) {
 		context.fillStyle = color;
 		context.beginPath();
 		context.rect(this.x,this.y,this.width, this.height);
@@ -194,9 +197,8 @@ function gameOver() {
 	score = 0;
 	context.fillText("Game Over", context.canvas.width/2 - 120, context.canvas.height/2);
 	setTimeout(() => {
-		// alert("Game Over");
 		document.location.reload();
-	},50);
+	},100);
 }
 
 
@@ -213,14 +215,18 @@ loop = ()=> {
 	drawGround();
 	drawObstacles("#00FF00");
 
-	let newObstacle = new Obstacle(600, 130, 16, 32, 1);
-	newObstacle.obstacleMovement();
-	newObstacle.drawObstacle("#00FF00");
+	obstacle2 = new Obstacle(600, 130, 16, 32, 1);
+	obstacle2.obstacleMovement(-3.5, 0.9);
+	obstacle2.drawObstacle("#00FF00");
 
-	console.log(newObstacle);
 	// Collision Detections
 	let obstacleBuffer = 7;
 	if (getDistance(player.x, player.y, obstacle.x, obstacle.y) < player.width + (obstacle.width - obstacleBuffer)) {
+		console.log('collision detected');
+		gameOver();
+	}
+
+	if (getDistance(player.x, player.y, obstacle2.x, obstacle2.y) < player.width + (obstacle2.width - obstacleBuffer)) {
 		console.log('collision detected');
 		gameOver();
 	}
@@ -231,6 +237,17 @@ loop = ()=> {
 	window.requestAnimationFrame(loop);
 };
 
-window.addEventListener("keydown", controller.keyListener)
-window.addEventListener("keyup", controller.keyListener);
-window.requestAnimationFrame(loop);
+(function(){
+  let requestAnimationFrame = window.requestAnimationFrame || 
+                              window.mozRequestAnimationFrame || 
+                              window.webkitRequestAnimationFrame || 
+                              window.msRequestAnimationFrame;
+
+	window.addEventListener("keydown", controller.keyListener)
+	window.addEventListener("keyup", controller.keyListener);
+	window.requestAnimationFrame(loop);
+
+})()
+
+
+
